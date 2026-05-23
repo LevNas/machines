@@ -1,0 +1,8 @@
+# NixOS secrets are stored at /etc/machines/private.nix (managed via 1Password)
+
+# Nix build results
+result
+result-*
+
+# chezmoi
+dotfiles/.chezmoistate.boltdb
