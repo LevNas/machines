@@ -1,0 +1,8 @@
+# Claude Code: session-specific files (not managed by chezmoi)
+.claude/projects/
+.claude/memory/
+.claude/plans/
+.claude/credentials.json
+.claude/statsig/
+.claude/settings.local.json
+.claude/plugins/

@@ -1,0 +1,91 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(record-knowledge)",
+      "WebFetch(domain:github.com)",
+      "Bash(curl *)",
+      "Bash(wget *)",
+      "Bash(git push *)",
+      "WebSearch",
+      "WebFetch(domain:zenn.dev)",
+      "Bash(npm run *)",
+      "Bash(yarn *)",
+      "Bash(pnpm *)",
+      "Bash(git status)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git branch *)",
+      "Bash(git checkout *)",
+      "Bash(git commit *)",
+      "Bash(git pull *)",
+      "Bash(git fetch *)",
+      "Bash(ls *)",
+      "Bash(which *)",
+      "Bash(echo *)",
+      "Bash(pwd)",
+      "Bash(date *)",
+      "Bash(fd *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(rg *)",
+      "Read(~/.local/share/chezmoi)",
+      "Read(~/src/github.com/LevNas/ccmemo)",
+      "Read(~/src/github.com/LevNas/claudecode-plugins)",
+      "Read(~/src/github.com/LevNas/cmigemo.nvim)",
+      "Read(~/src/github.com/LevNas/sapling-theme.nvim)"
+    ],
+    "deny": [
+      "Bash(ls -R)",
+      "Bash(git add .)",
+      "Bash(git add -A)",
+      "Bash(git push -f *)",
+      "Bash(git reset --hard *)",
+      "Bash(rm -rf /)",
+      "Bash(rm -rf ~)",
+      "Bash(rm -rf ~/*)",
+      "Bash(rm -rf /*)",
+      "Bash(chmod *)",
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Edit(./.env)",
+      "Edit(./.env.*)",
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/**)",
+      "Read(~/.cache/gitlab-token*)",
+      "Read(~/.config/op/**)",
+      "Bash(printenv*GITLAB*)",
+      "Bash(printenv*OP_SESSION*)",
+      "Bash(printenv*TOKEN*)",
+      "Bash(env|*grep*GITLAB*)",
+      "Bash(env|*grep*TOKEN*)",
+      "Bash(env|*grep*OP_SESSION*)",
+      "Bash(echo $GITLAB_TOKEN*)",
+      "Bash(echo $OP_SESSION*)",
+      "Bash(op read*)"
+    ],
+    "ask": [
+      "Bash(rm -rf *)",
+      "Bash(rm *)",
+      "Bash(mv *)",
+      "Bash(git merge *)"
+    ],
+    "defaultMode": "plan"
+  },
+  "enabledPlugins": {
+    "ccaudit@levnas-plugins": true,
+    "ccmemo@levnas-plugins": true,
+    "ccorch@levnas-plugins": true,
+    "ccresmon@levnas-plugins": true,
+    "ccevolve@levnas-plugins": true,
+    "skill-creator@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "levnas-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "LevNas/claudecode-plugins"
+      }
+    }
+  },
+  "language": "Japanese"
+}

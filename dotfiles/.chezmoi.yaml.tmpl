@@ -1,0 +1,11 @@
+{{- $osType := "linux" -}}
+{{- if eq .chezmoi.os "darwin" -}}
+{{-   $osType = "macos" -}}
+{{- else if eq .chezmoi.os "windows" -}}
+{{-   $osType = "windows" -}}
+{{- end -}}
+
+sourceDir: {{ .chezmoi.sourceDir | quote }}
+
+data:
+  osType: {{ $osType | quote }}
