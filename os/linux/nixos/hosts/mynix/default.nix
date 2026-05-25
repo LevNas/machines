@@ -14,6 +14,7 @@ in
     ../../roles/onepassword.nix
     ../../roles/virtualization.nix
     ../../roles/server.nix
+    ../../roles/secure-boot.nix
   ];
 
   # ブートローダ
