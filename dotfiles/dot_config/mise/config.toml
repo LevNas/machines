@@ -1,0 +1,13 @@
+# mise global tool configuration
+# Reference: https://mise.jdx.dev/configuration.html
+
+[tools]
+# bleeding-edge tools (no crates.io / nixpkgs entry yet)
+# Note: the "ubi:" backend is deprecated since mise 2026.x and will be removed in 2027.1.0
+# Use the unified "github:" backend instead.
+"github:Helvesec/rmux" = "latest"
+"github:oguna/rustmigemo" = "latest"
+
+[settings]
+# Enable idiomatic version files (.tool-versions, .python-version, etc.)
+idiomatic_version_file_enable_tools = ["python", "node"]

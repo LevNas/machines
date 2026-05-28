@@ -23,4 +23,8 @@
     EDITOR = "vim";
     VISUAL = "vim";
   };
+
+  # nix-ld: mise 等が取得する汎用 Linux 動的リンクバイナリを NixOS 上で実行可能にする
+  # https://nixos.wiki/wiki/Packaging/Binaries
+  programs.nix-ld.enable = true;
 }

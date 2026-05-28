@@ -1,2 +1,13 @@
 # SSH agent (1Password)
 export SSH_AUTH_SOCK=~/.1password/agent.sock
+
+# mise activation (tool version manager)
+if command -v mise >/dev/null 2>&1; then
+  eval "$(mise activate zsh)"
+fi
+
+# Editor: prefer nvim if available (falls back to vim from NixOS)
+if command -v nvim >/dev/null 2>&1; then
+  export EDITOR=nvim
+  export VISUAL=nvim
+fi

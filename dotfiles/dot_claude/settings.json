@@ -87,5 +87,13 @@
       }
     }
   },
-  "language": "Japanese"
+  "language": "Japanese",
+  "remoteControlAtStartup": true,
+  "inputNeededNotifEnabled": true,
+  "agentPushNotifEnabled": true,
+  "voiceEnabled": true,
+  "voice": {
+    "enabled": true,
+    "mode": "hold"
+  }
 }
