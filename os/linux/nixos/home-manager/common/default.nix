@@ -7,8 +7,7 @@
     # エディタ
     neovim
 
-    # バージョン管理
-    git
+    # バージョン管理 (git は NixOS systemPackages で管理)
     ghq
     gh
     lazygit
