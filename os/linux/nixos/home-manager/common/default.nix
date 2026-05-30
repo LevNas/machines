@@ -19,10 +19,9 @@
     # データ処理 (mise 経由で管理)
     # 移行済み: jq, yq
 
-    # Claude Code 関連 (claude-code は nixpkgs 版で安定運用)
+    # Claude Code 関連 (claude-code は nixpkgs 版で安定運用、node は mise 経由 aqua backend)
     claude-code
-    # nodejs_22: mise 2026.5.6 の core:node が source build バグで使えないため home-manager に保留
-    nodejs_22
+    # 移行済み: nodejs_22 → mise の aqua:nodejs/node
 
     # dotfile管理
     chezmoi

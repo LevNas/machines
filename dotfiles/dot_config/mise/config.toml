@@ -29,11 +29,11 @@ yq = "latest"
 # neovim publishes official linux tarball at github releases
 "github:neovim/neovim" = "latest"
 
-# Language runtimes (Wave 4: 保留中 / DEFERRED)
-# nixpkgs の mise 2026.5.6 では core:node が強制的に source build に陥り、
-# さらに compile 中に mise 本体が panic でクラッシュする (vfox/aqua/github backend で再評価予定)。
-# 当面 nodejs は home-manager (nixpkgs) で管理。mise 2026.5.16+ が nixpkgs に来たら再挑戦。
-# node = "22"
+# Language runtimes (Wave 4: aqua backend 経由)
+# core:node (mise 2026.5.6) は source build + panic クラッシュのバグを持つため不使用。
+# aqua backend は nodejs.org の prebuilt binary を取得する。
+# 注意: tarball が node-vX.Y.Z-linux-x64/ サブディレクトリ込みで展開されるため、bin_paths で明示
+"aqua:nodejs/node" = { version = "22", bin_paths = ["node-v{{version}}-linux-x64/bin"] }
 
 [settings]
 # Enable idiomatic version files (.tool-versions, .python-version, etc.)
