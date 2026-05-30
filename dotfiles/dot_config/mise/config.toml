@@ -8,6 +8,33 @@
 "github:Helvesec/rmux" = "latest"
 "github:oguna/rustmigemo" = "latest"
 
+# CLI utilities (Wave 1: migrated from home-manager 2026-05-30)
+"github:BurntSushi/ripgrep" = "latest"
+"github:sharkdp/fd" = "latest"
+"github:sharkdp/bat" = "latest"
+"github:eza-community/eza" = "latest"
+"github:ajeetdsouza/zoxide" = "latest"
+"github:junegunn/fzf" = "latest"
+"github:sxyazi/yazi" = "latest"
+"github:jqlang/jq" = "latest"
+# yq: GitHub release binary is named yq_linux_amd64; use mise's built-in registry to resolve this automatically
+yq = "latest"
+
+# git ecosystem (Wave 2: migrated from home-manager 2026-05-30)
+"github:x-motemen/ghq" = "latest"
+"github:cli/cli" = "latest"
+"github:jesseduffield/lazygit" = "latest"
+
+# Editor (Wave 3: migrated from home-manager 2026-05-30)
+# neovim publishes official linux tarball at github releases
+"github:neovim/neovim" = "latest"
+
+# Language runtimes (Wave 4: 保留中 / DEFERRED)
+# nixpkgs の mise 2026.5.6 では core:node が強制的に source build に陥り、
+# さらに compile 中に mise 本体が panic でクラッシュする (vfox/aqua/github backend で再評価予定)。
+# 当面 nodejs は home-manager (nixpkgs) で管理。mise 2026.5.16+ が nixpkgs に来たら再挑戦。
+# node = "22"
+
 [settings]
 # Enable idiomatic version files (.tool-versions, .python-version, etc.)
 idiomatic_version_file_enable_tools = ["python", "node"]

@@ -6,13 +6,14 @@
 
   # システムレベルのツール:
   # - vim: dotfiles 取り込み前の fallback エディタ
-  # - gcc/gnumake: ビルド基盤
+  # - gcc/gnumake/python3: ビルド基盤 (rustmigemo 辞書生成、native module ビルド等)
   # - mise: ユーザーツール (tmux, neovim, gh 等) のメタ管理。dotfiles の .mise.toml で宣言
   # - git: 1Password 統合 (op-ssh-sign) と密接なため NixOS で管理
   environment.systemPackages = with pkgs; [
     vim
     gcc
     gnumake
+    python3
     mise
     git
   ];
