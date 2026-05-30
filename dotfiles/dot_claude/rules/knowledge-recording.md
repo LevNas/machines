@@ -1,0 +1,47 @@
+# Knowledge Recording Rules
+
+Auto-memory is disabled (`autoMemoryEnabled: false`). Use the ccmemo plugin's `/record-knowledge` skill at the following explicit triggers instead.
+
+## When to Record (Mandatory)
+
+- **User explicitly requests recording**: "remember this", "覚えておいて", "this is important", etc. → invoke `/record-knowledge` immediately
+- **User points out my (Claude's) mistake**: record what was wrong, the root cause, and the corrective approach for next time
+- **A significant design decision is finalized**: record in ADR style — decision, rationale, and rejected alternatives
+- **A previously unresolved issue gets resolved**: extend the existing entry's "Solution" section (prefer extension over new entry)
+- **End-of-session reflection on lessons learned**: bulk-record multiple entries at session close
+
+## Decision Checklist
+
+If unsure whether to record, all three must be Yes:
+
+1. **Would a 3-month-future me want to look this up?**
+2. **Could this come up again on a different machine or project?**
+3. **Is it irrecoverable from code or git log alone (i.e., a judgment, pitfall, or tacit knowledge)?**
+
+All Yes → record. Any No → use a different location (see below).
+
+## What NOT to Record (vs. auto-memory)
+
+| Type | Better location |
+|---|---|
+| Transient progress state (current phase, in-progress tasks) | TaskCreate or notebooks/.claude/tasks/ |
+| User profile / preferences | `~/.claude/CLAUDE.md` / `~/.claude/rules/` |
+| Project-specific operational rules | notebooks/CLAUDE.md / notebooks/.claude/rules/ |
+| Current code state (implementation snapshot) | git log of the respective repository |
+| Transient errors / stack traces | Issue or PR description |
+
+## Record vs. Update Existing Entry
+
+| Pattern | Action |
+|---|---|
+| Same topic, existing entry present | **Extend the existing entry** (e.g., add to a pitfall set) |
+| Existing entry was "open" and now resolved | Append a "Solution (confirmed)" section + update status |
+| New, distinct topic (different context from existing) | Create new entry + add backlinks to related entries |
+| Existing entry had incorrect info | Correct it in place, demote old info to "Past consideration (for reference)" |
+
+**Principle**: One topic = one canonical entry. Avoid creating duplicate entries for the same topic.
+
+## Related
+
+- ccmemo display rule (show only filenames + H1/H2 headings) — see notebooks/CLAUDE.md
+- Private operational rules (machines repo secret management, etc.) — see notebooks/.claude/rules/
