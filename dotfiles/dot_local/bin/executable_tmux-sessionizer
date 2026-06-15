@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# tmux-sessionizer — fzf でプロジェクトを選び tmux セッションを作成/切替する
+# (chezmoi: executable_ prefix → ~/.local/bin/tmux-sessionizer として配置)
+#
+# 設計: 操作性のうち「セッション層」は tmux に集約 (wezterm と多重化を二重化しない方針)。
+# ソースは ghq 管理リポジトリ一覧。無ければ ~/src 配下を find でフォールバック。
+
+set -euo pipefail
+
+if [[ $# -eq 1 ]]; then
+  selected="$1"
+elif command -v ghq >/dev/null 2>&1; then
+  selected="$(ghq list -p | fzf)"
+else
+  selected="$(find "$HOME/src" "$HOME/projects" -mindepth 1 -maxdepth 3 -type d 2>/dev/null | fzf)"
+fi
+
+[[ -z "${selected:-}" ]] && exit 0
+
+# セッション名に使えない文字 (. と space) を _ に置換
+selected_name="$(basename "$selected" | tr '. ' '__')"
+
+# tmux 未起動 (TMUX 環境変数なし & tmux サーバなし) ならそのまま新規セッションで起動
+if [[ -z "${TMUX:-}" ]] && ! pgrep -x tmux >/dev/null 2>&1; then
+  tmux new-session -s "$selected_name" -c "$selected"
+  exit 0
+fi
+
+# セッションが無ければ detached で作成 → switch
+if ! tmux has-session -t="$selected_name" 2>/dev/null; then
+  tmux new-session -ds "$selected_name" -c "$selected"
+fi
+tmux switch-client -t "$selected_name"

@@ -1,0 +1,71 @@
+# ~/.zshrc — chezmoi managed
+# 初期化順序の鉄則 (参照ナレッジ mise-managed-cli-init-order):
+#   mise activate → mise管理ツールのinit(starship/zoxide/fzf) → sheldon source → keybindings
+# mise管理バイナリの init を activate より前に置くと PATH 不在で無言スキップされる。
+
+# ---------- Environment ----------
+# 1Password SSH agent。NOTE: Linux 固有パス。macOS/Windows 対応時は .tmpl 化して OS 分岐する。
+export SSH_AUTH_SOCK="$HOME/.1password/agent.sock"
+
+# History (機能・パワー: 大きめ履歴 + 重複圧縮 + 共有)
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=50000
+SAVEHIST=50000
+setopt SHARE_HISTORY HIST_IGNORE_DUPS HIST_IGNORE_SPACE HIST_VERIFY EXTENDED_HISTORY INC_APPEND_HISTORY
+
+# ---------- mise activation (必ず最初: 以降の mise 管理ツール init の前提) ----------
+if command -v mise &>/dev/null; then
+  eval "$(mise activate zsh)"
+  # `mise install` 直後の現シェル PATH 未追従を吸収する shim フォールバック (末尾追加)。
+  export PATH="$PATH:$HOME/.local/share/mise/shims"
+fi
+
+# ---------- Editor ----------
+if command -v nvim &>/dev/null; then
+  export EDITOR=nvim VISUAL=nvim
+fi
+
+# ---------- mise 管理ツールの init (mise activate の後でなければ動かない) ----------
+if command -v starship &>/dev/null; then
+  eval "$(starship init zsh)"
+fi
+# 注: zoxide init は「設定ファイルの末尾」が zoxide 推奨 (chpwd フックを他プラグインの後に張る)。
+#     よって下の sheldon source・modular source の後に置いている。
+# fzf: CTRL-R(履歴) / CTRL-T(ファイル) / ALT-C(cd) のキーバインドのみ。
+# Tab 補完は fzf-tab (sheldon) に一本化する (過去の Tab 二重バインド FUNCNEST 再帰を回避)。
+if command -v fzf &>/dev/null; then
+  eval "$(fzf --zsh)"
+fi
+
+# ---------- Plugins (sheldon) ----------
+# plugins.toml 内で compinit → fzf-tab → autosuggestions → history-substring-search
+# → fast-syntax-highlighting(最後) の順に並べてある。
+if command -v sheldon &>/dev/null; then
+  eval "$(sheldon source)"
+fi
+
+# ---------- Keybindings (プラグイン読み込み後に widget 存在を確認して bind) ----------
+if (( $+widgets[history-substring-search-up] )); then
+  bindkey '^[[A' history-substring-search-up    # Up
+  bindkey '^[[B' history-substring-search-down  # Down
+  bindkey '^P'   history-substring-search-up
+  bindkey '^N'   history-substring-search-down
+fi
+
+# ---------- Completion / fzf-tab styling ----------
+zstyle ':completion:*' menu no                  # fzf-tab 使用時は標準メニュー無効化
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'   # 大小文字あいまい一致
+zstyle ':fzf-tab:complete:cd:*' fzf-preview \
+  'eza -1 --icons --color=always $realpath 2>/dev/null || ls -1 $realpath'
+
+# ---------- Modular config (aliases.zsh / 将来 functions.zsh 等) ----------
+# (N) = null_glob: ファイルが無くてもエラーにしない。mise activate 後に source するので順序事故なし。
+for _f in "$HOME"/.config/zsh/*.zsh(N); do source "$_f"; done
+unset _f
+
+# ---------- zoxide (必ず最後: zoxide doctor 推奨。他プラグインの chpwd/precmd フックの後に init) ----------
+# mise activate の後 (PATH 解決済み) かつ全プラグイン source の後、という二重制約を満たす末尾位置。
+if command -v zoxide &>/dev/null; then
+  eval "$(zoxide init zsh)"
+  alias cd='z'
+fi

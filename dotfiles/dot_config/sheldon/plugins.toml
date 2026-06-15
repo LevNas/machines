@@ -1,0 +1,30 @@
+# sheldon — zsh plugin manager (chezmoi managed)
+#
+# 方針: oh-my-zsh のような全部入りを避け、必要なプラグインだけを正しい順序で。
+# 順序が機能の正否を決める (参照ナレッジ: sheldon-starship-migration / mise-managed-cli-init-order):
+#   1. compinit        … 補完システム初期化。fzf-tab より前に必須
+#   2. fzf-tab         … Tab 補完を fzf 化。compinit の後でなければ動かない
+#   3. autosuggestions … 履歴サジェスト
+#   4. history-substring-search … 部分一致履歴 (キーバインドは zshrc 側で widget 確認後に)
+#   5. fast-syntax-highlighting … 全 widget を wrap するため必ず最後
+#
+# 注意: starship / zoxide / fzf の init は mise 管理バイナリのため zshrc 側で
+#       `mise activate` の後に eval する (ここ sheldon には入れない)。
+
+shell = "zsh"
+
+[plugins.compinit]
+inline = 'autoload -Uz compinit && compinit'
+
+[plugins.fzf-tab]
+github = "Aloxaf/fzf-tab"
+
+[plugins.zsh-autosuggestions]
+github = "zsh-users/zsh-autosuggestions"
+
+[plugins.zsh-history-substring-search]
+github = "zsh-users/zsh-history-substring-search"
+
+# 必ず最後 (他プラグインの widget を wrap するため)
+[plugins.fast-syntax-highlighting]
+github = "zdharma-continuum/fast-syntax-highlighting"

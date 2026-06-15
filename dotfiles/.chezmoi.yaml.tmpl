@@ -1,0 +1,29 @@
+{{- $osType := "linux" -}}
+{{- if eq .chezmoi.os "darwin" -}}
+{{-   $osType = "macos" -}}
+{{- else if eq .chezmoi.os "windows" -}}
+{{-   $osType = "windows" -}}
+{{- end -}}
+
+{{- /* machineType: 単一選択のマシン種別 (work / home / project)。 */ -}}
+{{- /* init 時に一度だけ尋ね、生成された chezmoi.yaml に永続化される (promptChoiceOnce が既存値を優先)。 */ -}}
+{{- /* work=仕事用PC / home=自宅PC / project=チーム・プロジェクト用PC。 */ -}}
+{{- /* mise 層のツール出し分け (conf.d 分離 + .chezmoiignore gating) の判定軸。default は非対話 init 時のフォールバック。 */ -}}
+{{- $machineType := promptChoiceOnce . "machineType" "Machine type (work / home / project)" (list "work" "home" "project") "home" -}}
+
+{{- /* nvimSearchRoot: nvim (snacks picker) の追加横断検索ルートの絶対パス。 */ -}}
+{{- /* 環境差を設定で吸収するため、実値はマシンローカル config に保存しテンプレートへ注入する。 */ -}}
+{{- /* 空なら追加ルートなし (cwd 由来の generic 検索のみ)。 */ -}}
+{{- $nvimSearchRoot := promptStringOnce . "nvimSearchRoot" "Extra search root for nvim (abs path, empty to skip)" "" -}}
+
+{{- /* knowledgeRepo: 個人ナレッジ repo のディレクトリ名 (claude ルールが参照する記録先)。 */ -}}
+{{- /* 公開ソースに実名を残さないため、実値はマシンローカル config に保存しテンプレートへ注入する。 */ -}}
+{{- $knowledgeRepo := promptStringOnce . "knowledgeRepo" "Personal knowledge repo dir name for claude rules (empty to skip)" "" -}}
+
+sourceDir: {{ .chezmoi.sourceDir | quote }}
+
+data:
+  osType: {{ $osType | quote }}
+  machineType: {{ $machineType | quote }}
+  nvimSearchRoot: {{ $nvimSearchRoot | quote }}
+  knowledgeRepo: {{ $knowledgeRepo | quote }}

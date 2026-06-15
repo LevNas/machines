@@ -1,0 +1,20 @@
+# Claude Code: session-specific files (not managed by chezmoi)
+.claude/projects/
+.claude/memory/
+.claude/plans/
+.claude/credentials.json
+.claude/statsig/
+.claude/settings.local.json
+.claude/plugins/
+
+# machineType gating: home 専用ツールの設定は home 以外には配布しない。
+# .chezmoiignore は chezmoi が常に template 処理する。パターンは target パス基準。
+{{ if ne .machineType "home" }}
+.config/mise/conf.d/home.toml
+{{ end }}
+
+# wezterm ランタイム状態 (透過率 opacity.state / フォントサイズ fontsize.state 等を永続化。chezmoi 管理対象外)
+.config/wezterm/*.state
+
+# nvim: lazy.nvim のロックファイル (ランタイム書込)。再現性追跡したくなったら管理対象に戻す。
+.config/nvim/lazy-lock.json

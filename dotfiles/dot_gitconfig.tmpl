@@ -1,0 +1,22 @@
+[user]
+	name = {{ onepasswordRead "op://Personal/git-config/username" | trim | quote }}
+	email = {{ onepasswordRead "op://Personal/git-config/email" | trim | quote }}
+	signingkey = {{ onepasswordRead "op://Personal/git-config/signing-key" | trim | quote }}
+[init]
+	defaultBranch = main
+[pull]
+	rebase = false
+[gpg]
+	format = ssh
+[commit]
+	gpgsign = true
+[gpg "ssh"]
+{{- if eq .osType "linux" }}
+	program = /run/current-system/sw/bin/op-ssh-sign
+{{- else if eq .osType "windows" }}
+	program = C:/Users/{{ onepasswordRead "op://Personal/git-config/username" | trim }}/AppData/Local/1Password/app/8/op-ssh-sign.exe
+{{- else if eq .osType "macos" }}
+	program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
+{{- end }}
+[ghq]
+	root = ~/src

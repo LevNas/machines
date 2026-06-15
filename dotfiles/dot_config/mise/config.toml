@@ -1,0 +1,65 @@
+# mise global tool configuration
+# Reference: https://mise.jdx.dev/configuration.html
+
+[tools]
+# bleeding-edge tools (no crates.io / nixpkgs entry yet)
+# Note: the "ubi:" backend is deprecated since mise 2026.x and will be removed in 2027.1.0
+# Use the unified "github:" backend instead.
+"github:Helvesec/rmux" = "latest"
+"github:oguna/rustmigemo" = "latest"
+
+# CLI utilities (Wave 1: migrated from home-manager 2026-05-30)
+"github:BurntSushi/ripgrep" = "latest"
+"github:sharkdp/fd" = "latest"
+"github:sharkdp/bat" = "latest"
+"github:eza-community/eza" = "latest"
+"github:ajeetdsouza/zoxide" = "latest"
+"github:junegunn/fzf" = "latest"
+"github:sxyazi/yazi" = "latest"
+"github:jqlang/jq" = "latest"
+# yq: GitHub release binary is named yq_linux_amd64; use mise's built-in registry to resolve this automatically
+yq = "latest"
+
+# git ecosystem (Wave 2: migrated from home-manager 2026-05-30)
+"github:x-motemen/ghq" = "latest"
+"github:cli/cli" = "latest"
+"github:jesseduffield/lazygit" = "latest"
+
+# Editor (Wave 3: migrated from home-manager 2026-05-30)
+# neovim publishes official linux tarball at github releases
+"github:neovim/neovim" = "latest"
+# tree-sitter CLI: nvim-treesitter main ブランチがパーサを自前コンパイルする際に必須。
+# (lua/vim 等は neovim 同梱だが nix/bash 等は CLI でビルドする。未導入だと起動毎に compile エラー)
+# registry 第1候補が aqua のためそのまま採用。
+"aqua:tree-sitter/tree-sitter" = "latest"
+
+# Language runtimes (Wave 4: aqua backend 経由)
+# core:node (mise 2026.5.6) は source build + panic クラッシュのバグを持つため不使用。
+# aqua backend は nodejs.org の prebuilt binary を取得する。
+# 注意: tarball が node-vX.Y.Z-linux-x64/ サブディレクトリ込みで展開されるため、bin_paths で明示
+"aqua:nodejs/node" = { version = "22", bin_paths = ["node-v{{version}}-linux-x64/bin"] }
+
+# Claude 系ツール (Wave 5: migrated from home-manager 2026-05-31)
+# Claude Code: 公式 GitHub release を aqua backend 経由で取得。
+#   nixpkgs 反映ラグを避けるため mise 側で管理。更新は `mise upgrade` で明示的に行う方針（latest 固定）。
+# ccusage: 公式推奨の bunx 実行のため bun のみ mise 管理。ccusage 自体は bunx キャッシュに任せる。
+#   ref: https://github.com/ryoppippi/ccusage#installation
+"aqua:anthropics/claude-code" = "latest"
+bun = "latest"
+
+# Shell environment (shell refresh 2026-06)
+# sheldon: zsh プラグインマネージャ。aqua backend で prebuilt 取得 (cargo build は openssl-sys でコケる前例があるため回避)。
+# starship: クロスシェル prompt。単一バイナリで全OS同一・テーマ統一の核。
+# どちらも汎用ツールなので main config (全マシン共通)。zshrc 側の init は必ず mise activate の後に置くこと。
+"aqua:rossmacarthur/sheldon" = "latest"
+"aqua:starship/starship" = "latest"
+
+# Python tooling (2026-06)
+# uv: 高速 Python package manager / runner。uvx で一過性 Python CLI を隔離実行する用途。
+#   導入契機は git filter-repo の単発実行 (pipx backend は pipx 本体不在で失敗、uv に切替)。
+#   registry 第1候補。汎用ツールなので main config (全マシン共通)。
+uv = "latest"
+
+[settings]
+# Enable idiomatic version files (.tool-versions, .python-version, etc.)
+idiomatic_version_file_enable_tools = ["python", "node"]

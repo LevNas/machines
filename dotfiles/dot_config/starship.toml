@@ -1,0 +1,35 @@
+# starship prompt (chezmoi managed) — 軽量・高速
+# 視線左寄りの習慣に合わせ時刻を左端に配置 (過去知見: 視線位置を意識したUI配置)。
+# テーマ配色統一・transient prompt は後フェーズで調整 (transient は別 pitfall 領域のため段階的に)。
+
+add_newline = true
+command_timeout = 500   # 遅い module で prompt が固まらないよう上限
+
+# 左端に時刻 → カレントディレクトリ → git → 入力記号
+format = "$time $directory$git_branch$git_status$character"
+
+[time]
+disabled = false
+format = "[$time]($style)"
+time_format = "%H:%M"
+style = "bold cyan"
+
+[directory]
+truncation_length = 3
+truncate_to_repo = true
+style = "bold blue"
+
+[git_branch]
+symbol = " "
+style = "bold purple"
+
+[git_status]
+style = "bold red"
+
+[cmd_duration]
+min_time = 2000
+format = "took [$duration]($style) "
+
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"

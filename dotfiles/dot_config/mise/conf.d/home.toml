@@ -1,0 +1,18 @@
+# mise: home マシン限定ツール (machineType=home)
+#
+# このファイルは chezmoi が machineType=home のマシンにのみ配布する。
+# gate は dotfiles/.chezmoiignore の `{{ if ne .machineType "home" }}` ブロックが担う。
+# config.toml を template 化せず「別ファイルの配布有無」で出し分けることで、
+# config.toml の双方向同期 (pre-commit chezmoi re-add) を壊さない設計。
+#
+# mise は ~/.config/mise/conf.d/*.toml を config.toml に自動マージして読む。
+# 設計判断の詳細: <knowledge-repo>/.claude/knowledge/entries/.../chezmoi-machinetype-gating-implementation.md
+
+[tools]
+# home マシン限定の汎用ツール。
+#
+# yt-dlp: 汎用の動画取得ツール。当初 ytui (YouTube TUI) の再生バックエンドとして導入したが、
+#   ytui は登録チャンネル一覧こそ OAuth (公式API) だが検索/動画取得が Invidious 依存で、
+#   「Premium 課金者として Invidious/グレーゾーンを避けたい」方針に合わず撤去 (視聴は公式 web/アプリへ)。
+#   yt-dlp 自体は YouTube 以外も含む汎用ツールとして残置。不要なら mise から外してよい。経緯はナレッジ参照。
+"github:yt-dlp/yt-dlp" = "latest"
