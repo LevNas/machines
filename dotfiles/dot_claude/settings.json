@@ -116,7 +116,8 @@
     "security-guidance@claude-plugins-official": true,
     "pyright-lsp@claude-plugins-official": true,
     "lua-lsp@claude-plugins-official": true,
-    "serena@claude-plugins-official": true
+    "serena@claude-plugins-official": true,
+    "ccguard@levnas-plugins": true
   },
   "extraKnownMarketplaces": {
     "levnas-plugins": {
@@ -127,6 +128,7 @@
     }
   },
   "language": "Japanese",
+  "effortLevel": "xhigh",
   "voice": {
     "enabled": true,
     "mode": "hold"

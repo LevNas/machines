@@ -24,9 +24,9 @@ All Yes → record. Any No → use a different location (see below).
 
 | Type | Better location |
 |---|---|
-| Transient progress state (current phase, in-progress tasks) | TaskCreate or {{ .knowledgeRepo }}/.claude/tasks/ |
+| Transient progress state (current phase, in-progress tasks) | TaskCreate or {{ .knowledgeRepo | default "<knowledge-repo>" }}/.claude/tasks/ |
 | User profile / preferences | `~/.claude/CLAUDE.md` / `~/.claude/rules/` |
-| Project-specific operational rules | {{ .knowledgeRepo }}/CLAUDE.md / {{ .knowledgeRepo }}/.claude/rules/ |
+| Project-specific operational rules | {{ .knowledgeRepo | default "<knowledge-repo>" }}/CLAUDE.md / {{ .knowledgeRepo | default "<knowledge-repo>" }}/.claude/rules/ |
 | Current code state (implementation snapshot) | git log of the respective repository |
 | Transient errors / stack traces | Issue or PR description |
 
@@ -43,5 +43,5 @@ All Yes → record. Any No → use a different location (see below).
 
 ## Related
 
-- ccmemo display rule (show only filenames + H1/H2 headings) — see {{ .knowledgeRepo }}/CLAUDE.md
-- Private operational rules (machines repo secret management, etc.) — see {{ .knowledgeRepo }}/.claude/rules/
+- ccmemo display rule (show only filenames + H1/H2 headings) — see {{ .knowledgeRepo | default "<knowledge-repo>" }}/CLAUDE.md
+- Private operational rules (machines repo secret management, etc.) — see {{ .knowledgeRepo | default "<knowledge-repo>" }}/.claude/rules/
