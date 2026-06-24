@@ -37,6 +37,23 @@
       "${pkgs.tmuxPlugins.jump}/share/tmux-plugins/jump";
     ".config/tmux/plugins/thumbs".source =
       "${pkgs.tmuxPlugins.tmux-thumbs}/share/tmux-plugins/tmux-thumbs";
+
+    # fcitx5 の XDG autostart を無効化 (Plasma Wayland 専用前提)。
+    # i18n.inputMethod が systemPackages に入れる fcitx5 はパッケージ同梱の
+    # etc/xdg/autostart/org.fcitx.Fcitx5.desktop を持ち、systemd-xdg-autostart-generator が
+    # app-org.fcitx.Fcitx5@autostart.service を生成する。一方 Plasma Wayland では KWin が
+    # input-method-v2 経由で fcitx5 を起動するのが正で、両者がログイン時に二重起動を競合する。
+    # systemd autostart 側が勝つと KWin 管理外 fcitx5 が単一インスタンス制約 (dbus org.fcitx.Fcitx5)
+    # で正規の v2 起動を塞ぎ、日本語入力が突然死ぬ (protocol 0)。
+    # Hidden=true でユーザ autostart を最優先で無効化し、起動を KWin に一本化する。
+    # ※ X11 セッションや KWin 以外の WM を使うホストを追加する場合は要再検討。
+    # 根拠: 個人ナレッジ KB エントリ 20260616-160000-plasma-wayland-fcitx5-kwin-vs-systemd-autostart-conflict
+    ".config/autostart/org.fcitx.Fcitx5.desktop".text = ''
+      [Desktop Entry]
+      Type=Application
+      Name=Fcitx 5
+      Hidden=true
+    '';
   };
 
   # home-manager 自身の管理を有効化
