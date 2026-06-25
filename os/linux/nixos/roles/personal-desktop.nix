@@ -99,8 +99,14 @@
     monospace = [ "JetBrainsMono Nerd Font" ];
   };
 
-  # ターミナルエミュレータ
+  # デスクトップアプリ (GUI)
   environment.systemPackages = with pkgs; [
+    # ターミナルエミュレータ
     wezterm
+    # ビデオ会議 (unfree, allowUnfree は hosts/mynix/default.nix で設定済み)。
+    # nixpkgs が Zoom 公式バイナリを buildFHSEnv(bubblewrap) で wrap（更新は nixpkgs 追従）。
+    # FHS 互換のための名前空間分離はあるが権限縮小ではない（ホーム/デバイスへのアクセスは広い）。
+    # 脆弱性履歴を踏まえ、常用はブラウザ参加・ネイティブは必要時のみ起動する運用前提で採用。
+    zoom-us
   ];
 }
