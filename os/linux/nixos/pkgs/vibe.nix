@@ -7,7 +7,14 @@
 # バイナリ構成:
 #   - vibe: Tauri GUI 本体 (webkit2gtk-4.1 / gtk3 / libxdo / alsa に動的リンク)
 #   - sona: Whisper 推論エンジンのサイドカー (openssl / vulkan / libgomp に動的リンク。
-#           whisper.cpp / ffmpeg は静的リンク済みでバンドル .so は無い)
+#           whisper.cpp は静的リンク済みでバンドル .so は無い)
+#
+# リンク依存以外の実行時依存 (deb の control Depends と実挙動から。NEEDED には現れない):
+#   - ffmpeg: vibe が外部 CLI として exec する (無いと transcribe 時に "ffmpeg not found" エラー)
+#     → wrapper の PATH に注入
+#   - GStreamer plugins (base/good 等): webkit のメディア再生・録音が実行時に要求。
+#     欠けると WebKitWebProcess が createAudioSink で coredump し UI がフリーズする
+#     → buildInputs に置けば wrapGAppsHook3 が GST_PLUGIN_SYSTEM_PATH_1_0 を注入
 #
 # バージョン更新手順:
 #   1. version を上げる
@@ -21,9 +28,11 @@
 , wrapGAppsHook3
 , alsa-lib
 , cairo
+, ffmpeg
 , gdk-pixbuf
 , glib
 , glib-networking
+, gst_all_1
 , gtk3
 , libsoup_3
 , openssl
@@ -55,6 +64,13 @@ stdenv.mkDerivation rec {
     # libsoup の TLS backend。モデルダウンロード (https) に必須。
     # wrapGAppsHook3 が GIO_EXTRA_MODULES として wrapper に注入する
     glib-networking
+    # webkit のメディア再生・録音 (appsink/autoaudiosink 等)。wrapGAppsHook3 が
+    # GST_PLUGIN_SYSTEM_PATH_1_0 を注入する。libav は ffmpeg 系コーデックの補完
+    gst_all_1.gstreamer
+    gst_all_1.gst-plugins-base
+    gst_all_1.gst-plugins-good
+    gst_all_1.gst-plugins-bad
+    gst_all_1.gst-libav
     gtk3
     libsoup_3
     openssl
@@ -79,10 +95,17 @@ stdenv.mkDerivation rec {
     runHook postInstall
   '';
 
-  # upstream の .desktop は Categories が空でメニュー分類されないため補完する
+  # upstream の .desktop は Categories が空でメニュー分類されない・
+  # MimeType (x-scheme-handler) 宣言に対して Exec に %u が無い、をそれぞれ補完する
   postInstall = ''
     substituteInPlace $out/share/applications/vibe.desktop \
-      --replace-fail "Categories=" "Categories=AudioVideo;Audio;Utility;"
+      --replace-fail "Categories=" "Categories=AudioVideo;Audio;Utility;" \
+      --replace-fail "Exec=vibe" "Exec=vibe %u"
+  '';
+
+  # ffmpeg は vibe が外部 CLI として exec する実行時依存 (deb control の Depends 参照)
+  preFixup = ''
+    gappsWrapperArgs+=(--prefix PATH : ${lib.makeBinPath [ ffmpeg ]})
   '';
 
   meta = {
