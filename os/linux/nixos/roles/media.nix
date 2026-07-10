@@ -37,5 +37,7 @@
     brave
     # mpv: 動画プレーヤー。ytui (mise: home 限定) の再生バックエンド。
     mpv
+    # vibe: ローカル文字起こし GUI (Whisper/Tauri)。nixpkgs 未収載のため deb を wrap
+    (callPackage ../pkgs/vibe.nix { })
   ];
 }
