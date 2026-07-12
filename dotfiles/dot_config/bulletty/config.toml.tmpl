@@ -1,13 +1,14 @@
 {{- /* bulletty (TUI RSS リーダー) 設定。
      datapath: 既定の XDG data 位置（マシンごとの home を展開）。
-     hooks.after_tui: TUI 終了時に Read Later（お気に入り）記事を個人ナレッジ repo の
-       rss/sync-favorites.sh で同期する。repo 名は公開ソースに残さないため
-       マシンローカルの knowledgeRepo data キーから注入する（未設定なら hooks 自体を省略）。
+     hooks.after_tui: TUI 終了時に Read Later（お気に入り）記事を個人ナレッジ repo へ同期する。
+       PATH ラッパー rss-fav-sync（dot_local/bin）経由で呼ぶことで、私的 repo パスの
+       組み立てをラッパー側に一本化している。knowledgeRepo 未設定マシンには
+       ラッパー自体が配布されないため、hooks 節ごと省略する。
      注意: bulletty 自身がこのファイルを書き換えることがある（`bulletty dirs library` 等）。
        chezmoi apply で管理状態に戻る（このテンプレートが正）。 */ -}}
 datapath = "{{ .chezmoi.homeDir }}/.local/share/bulletty"
 {{- if .knowledgeRepo }}
 
 [hooks]
-after_tui = "{{ .chezmoi.homeDir }}/src/github.com/LevNas/{{ .knowledgeRepo }}/rss/sync-favorites.sh"
+after_tui = "{{ .chezmoi.homeDir }}/.local/bin/rss-fav-sync"
 {{- end }}
