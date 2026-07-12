@@ -2,8 +2,8 @@
 
 # bulletty ラッパー: TUI 終了後に after_tui フックを代行実行する。
 # bulletty v0.2.2 は config の [hooks] を未サポート（upstream ではリリース後に追加）のため、
-# hooks 対応リリースが出るまでこのラッパーが config から after_tui のパスを読んで実行する。
-# パス自体はマシンローカル（chezmoi が config.toml.tmpl へ注入）なので、ここには何も焼かない。
+# hooks 対応リリースが出るまでこのラッパーが config から after_tui のコマンドを読んで実行する。
+# コマンド文字列はマシンローカル（chezmoi が config.toml.tmpl へ注入）なので、ここには何も焼かない。
 # 対応リリース後も残して無害（同期スクリプトは冪等・二重実行安全）。不要になったら削除してよい。
 bulletty() {
     command bulletty "$@"
@@ -13,7 +13,8 @@ bulletty() {
         local hook
         hook="$(sed -n 's/^after_tui = "\(.*\)"$/\1/p' \
             "${XDG_CONFIG_HOME:-$HOME/.config}/bulletty/config.toml" 2>/dev/null | head -n1)"
-        [[ -n "$hook" && -x "$hook" ]] && "$hook"
+        # upstream の実装（sh -c）と同じ意味論で実行する（引数付きコマンドに対応）
+        [[ -n "$hook" ]] && sh -c "$hook"
     fi
     return $rc
 }
