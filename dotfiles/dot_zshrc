@@ -7,6 +7,10 @@
 # 1Password SSH agent。NOTE: Linux 固有パス。macOS/Windows 対応時は .tmpl 化して OS 分岐する。
 export SSH_AUTH_SOCK="$HOME/.1password/agent.sock"
 
+# ユーザーローカルの実行スクリプト (chezmoi 配布の PATH ラッパー bkm / rss-fav-sync 等)。
+# mise activate が後で自身のパスを先頭に足すため、名前衝突時は mise 側が勝つ順序になる。
+export PATH="$HOME/.local/bin:$PATH"
+
 # History (機能・パワー: 大きめ履歴 + 重複圧縮 + 共有)
 HISTFILE="$HOME/.zsh_history"
 HISTSIZE=50000
