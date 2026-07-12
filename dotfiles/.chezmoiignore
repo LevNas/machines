@@ -19,6 +19,13 @@
 .config/bulletty/**
 {{ end }}
 
+# knowledgeRepo gating: 個人ナレッジ repo のスクリプトを呼ぶ PATH ラッパーは、
+# knowledgeRepo 未設定（= repo が無い）マシンには配布しない。
+{{ if not .knowledgeRepo }}
+.local/bin/bkm
+.local/bin/rss-fav-sync
+{{ end }}
+
 # wezterm ランタイム状態 (透過率 opacity.state / フォントサイズ fontsize.state 等を永続化。chezmoi 管理対象外)
 .config/wezterm/*.state
 

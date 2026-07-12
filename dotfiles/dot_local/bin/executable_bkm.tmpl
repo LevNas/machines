@@ -1,0 +1,5 @@
+#!/bin/sh
+# bkm <URL> [出力先dir] — URL の Markdown 魚拓ブックマークを保存する PATH ラッパー。
+# 実体は個人ナレッジ repo 側（bookmarks/save-bookmark.sh）にあり、そちらが単一ソース。
+# repo 名はマシンローカルの knowledgeRepo data キーから注入（glab-op と同じ薄ラッパー方式）。
+exec "{{ .chezmoi.homeDir }}/src/github.com/LevNas/{{ .knowledgeRepo }}/bookmarks/save-bookmark.sh" "$@"

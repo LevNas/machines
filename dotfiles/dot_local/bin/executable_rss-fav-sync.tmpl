@@ -1,0 +1,5 @@
+#!/bin/sh
+# rss-fav-sync — bulletty の Read Later（お気に入り）を個人ナレッジ repo へ同期する PATH ラッパー。
+# 実体は個人ナレッジ repo 側（rss/sync-favorites.sh）にあり、そちらが単一ソース。
+# 通常は bulletty の after_tui（または zsh ラッパー）が呼ぶため手動実行は任意。
+exec "{{ .chezmoi.homeDir }}/src/github.com/LevNas/{{ .knowledgeRepo }}/rss/sync-favorites.sh" "$@"
