@@ -1,0 +1,122 @@
+#!/usr/bin/env bash
+# rss-fav-sync — bulletty の Read Later（お気に入り）記事をアーカイブ先へ保存する汎用スクリプト。
+#
+# 使い方:
+#   rss-fav-sync [アーカイブ先ディレクトリ]
+#     アーカイブ先の解決順: 引数 → $RSS_FAV_DIR → エラー
+#     （既定の保存先はマシンローカル env で注入する。~/.config/zsh/knowledge-dirs.zsh 参照。
+#       bulletty の after_tui フックからは引数付きで呼ばれる）
+#
+# 保存内容:
+#   - フロントマター（+++ TOML）はフィードエントリのものを引き継ぎ、
+#     saved_from = "web" | "feed" を追記する
+#   - 本文は url の参照先記事を trafilatura（uvx 隔離実行）で取得して Markdown 化
+#     したもの（リンクは [text](url)、画像は ![alt](url) の Markdown 記法へ変換。
+#     画像はダウンロードせず URL 参照のまま）
+#   - 取得失敗時（オフライン・paywall・uvx 不在・タイムアウト）は
+#     フィードエントリ本文のまま保存（saved_from = "feed"）
+#
+# 一方向・追記のみ:
+#   - コピー先（<アーカイブ先>/<カテゴリ>/<フィードslug>/<記事slug>.md）に既存ファイルが
+#     あれば上書きしない（アーカイブ側での手動編集・タグ追記を保護する）
+#   - saved_from = "feed" の記事を web 版で取り直す場合は、該当ファイルを削除して再実行
+#   - bulletty 側で Read Later から外しても、保存済みの記事は消さない
+#     （アーカイブは恒久、Read Later は一時マーカーという役割分担）
+#
+# 環境変数:
+#   RSS_FAV_DIR       アーカイブ先ディレクトリの既定値
+#   BULLETTY_LIBRARY  bulletty ライブラリのパス（未指定なら `bulletty dirs library` で解決）
+#   FETCH_TIMEOUT     記事1件あたりの取得タイムアウト秒（既定 45）
+set -euo pipefail
+
+FETCH_TIMEOUT="${FETCH_TIMEOUT:-45}"
+
+DEST_ROOT="${1:-${RSS_FAV_DIR:-}}"
+if [[ -z "$DEST_ROOT" ]]; then
+    echo "error: アーカイブ先が未指定です（引数で指定するか RSS_FAV_DIR を設定してください）" >&2
+    exit 2
+fi
+
+if [[ -z "${BULLETTY_LIBRARY:-}" ]] && ! command -v bulletty >/dev/null 2>&1; then
+    echo "error: bulletty が見つかりません（BULLETTY_LIBRARY で直接指定も可）" >&2
+    exit 1
+fi
+
+LIB="${BULLETTY_LIBRARY:-$(bulletty dirs library)}"
+LATER_FILE="$LIB/.later.toml"
+
+if [[ ! -f "$LATER_FILE" ]]; then
+    echo "Read Later リストが未作成のため何もしません: $LATER_FILE"
+    exit 0
+fi
+
+can_fetch=0
+if command -v uvx >/dev/null 2>&1 && command -v timeout >/dev/null 2>&1; then
+    can_fetch=1
+else
+    echo "warn: uvx が無いため参照先記事は取得せず、フィードエントリ本文のまま保存します" >&2
+fi
+
+# 参照先記事を本文抽出 + Markdown 化して標準出力へ（失敗時は非0）
+fetch_article() {
+    timeout "$FETCH_TIMEOUT" uvx trafilatura \
+        --output-format markdown --links --images -u "$1" 2>/dev/null
+}
+
+# フロントマター（+++ ... +++）を出力し、閉じ +++ の直前に saved_from を挿入
+frontmatter_with() {
+    awk -v sf="$2" '
+        /^\+\+\+$/ { c++; if (c == 2) { printf "saved_from = \"%s\"\n", sf; print; exit } print; next }
+        c == 1 { print }
+    ' "$1"
+}
+
+# フィードエントリの本文部分（2つ目の +++ 以降）を出力
+entry_body() {
+    awk '/^\+\+\+$/ { c++; next } c >= 2 { print }' "$1"
+}
+
+copied_web=0
+copied_feed=0
+skipped=0
+missing=0
+
+# .later.toml は read_later = ["<categories/ 配下の相対パス>", ...] という
+# 1 つの文字列配列のみ（bulletty v0.2.2 の ReadLaterData 構造体を確認済み）。
+# クォート文字列を抽出し、実在チェックをフィルタとして使う。
+while IFS= read -r rel; do
+    case "$rel" in
+        *..*) echo "skip (不正なパス): $rel" >&2; continue ;;
+    esac
+
+    src="$LIB/categories/$rel"
+    dest="$DEST_ROOT/$rel"
+
+    if [[ ! -f "$src" ]]; then
+        missing=$((missing + 1))
+        continue
+    fi
+    if [[ -e "$dest" ]]; then
+        skipped=$((skipped + 1))
+        continue
+    fi
+
+    url="$(sed -n 's/^url = "\(.*\)"$/\1/p' "$src" | head -1)"
+    body=""
+    if [[ $can_fetch -eq 1 && -n "$url" ]]; then
+        body="$(fetch_article "$url" || true)"
+    fi
+
+    mkdir -p "$(dirname "$dest")"
+    if [[ -n "$body" ]]; then
+        { frontmatter_with "$src" "web"; printf '\n%s\n' "$body"; } > "$dest"
+        echo "saved (web): $rel"
+        copied_web=$((copied_web + 1))
+    else
+        { frontmatter_with "$src" "feed"; printf '\n'; entry_body "$src"; } > "$dest"
+        echo "saved (feed): $rel"
+        copied_feed=$((copied_feed + 1))
+    fi
+done < <(grep -oE '"[^"]+"' "$LATER_FILE" | tr -d '"')
+
+echo "favorites sync: web取得 ${copied_web} 件 / フィード本文 ${copied_feed} 件 / 保存済み ${skipped} 件 / 元記事なし ${missing} 件"

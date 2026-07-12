@@ -1,0 +1,6 @@
+# 個人ナレッジ repo 内のアーカイブ先ディレクトリ（machine-local 注入）。
+# dot_local/bin の汎用スクリプト（bkm / rss-fav-sync）はこの env を既定の保存先として使う。
+# repo 名は knowledgeRepo data キーから注入し、公開ソースには残さない。
+# knowledgeRepo 未設定マシンには .chezmoiignore の gate で本ファイル自体を配布しない。
+export BKM_DIR="{{ .chezmoi.homeDir }}/src/github.com/LevNas/{{ .knowledgeRepo }}/bookmarks"
+export RSS_FAV_DIR="{{ .chezmoi.homeDir }}/src/github.com/LevNas/{{ .knowledgeRepo }}/rss"

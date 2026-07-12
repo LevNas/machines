@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+# bkm — URL を「Markdown 魚拓を兼ねたブックマーク」として保存する汎用スクリプト。
+#
+# 使い方:
+#   bkm <URL> [出力先ディレクトリ]
+#     出力先の解決順: 引数 → $BKM_DIR → エラー
+#     （既定の保存先はマシンローカル env で注入する。~/.config/zsh/knowledge-dirs.zsh 参照）
+#
+# 形式:
+#   - TOML フロントマター: title / url / author / date / description / saved / saved_from
+#     （メタデータは trafilatura --with-metadata の YAML から抽出）
+#   - 本文は trafilatura（uvx 隔離実行）で本文抽出 + Markdown 化。
+#     リンクは [text](url)、画像は ![alt](url) の Markdown 記法へ変換
+#     （画像はダウンロードせず URL 参照のまま）
+#   - 取得失敗時（オフライン・paywall・JS 必須ページ）はリンクのみ保存
+#     （saved_from = "link"。`rg 'saved_from = "link"'` で取り直し対象を列挙できる）
+#
+# ファイル名: <YYYYMMDD>-<URLパス由来のslug>.md（同名衝突時は -HHMMSS を付加）
+#
+# 環境変数:
+#   BKM_DIR        出力先ディレクトリの既定値
+#   FETCH_TIMEOUT  取得タイムアウト秒（既定 45）
+set -euo pipefail
+
+FETCH_TIMEOUT="${FETCH_TIMEOUT:-45}"
+
+usage() {
+    echo "usage: bkm <URL> [出力先ディレクトリ]（省略時は \$BKM_DIR）" >&2
+    exit 2
+}
+
+[[ $# -ge 1 && $# -le 2 ]] || usage
+url="$1"
+case "$url" in
+    http://*|https://*) ;;
+    *) echo "error: URL は http(s):// で始めてください: $url" >&2; exit 2 ;;
+esac
+
+dest_dir="${2:-${BKM_DIR:-}}"
+if [[ -z "$dest_dir" ]]; then
+    echo "error: 出力先が未指定です（第2引数で指定するか BKM_DIR を設定してください）" >&2
+    exit 2
+fi
+mkdir -p "$dest_dir"
+
+if ! command -v uvx >/dev/null 2>&1; then
+    echo "error: uvx が必要です（mise の uv 経由で導入済みのはず）" >&2
+    exit 1
+fi
+
+raw="$(timeout "$FETCH_TIMEOUT" uvx trafilatura \
+    --output-format markdown --with-metadata --links --images -u "$url" 2>/dev/null || true)"
+
+# --with-metadata は本文先頭に YAML ブロック（--- ... ---）を付ける。
+# そこから title / author / date / description を拾い、ブロック自体は本文から除去する。
+meta=""
+body="$raw"
+if [[ "$raw" == ---$'\n'* ]]; then
+    meta="$(printf '%s\n' "$raw" | awk '/^---$/ { c++; next } c == 1 { print } c >= 2 { exit }')"
+    body="$(printf '%s\n' "$raw" | awk '/^---$/ { c++; next } c >= 2 { print }')"
+fi
+meta_field() { printf '%s\n' "$meta" | sed -n "s/^$1: //p" | head -1; }
+title="$(meta_field title)"
+author="$(meta_field author)"
+published="$(meta_field date)"
+description="$(meta_field description)"
+
+# タイトル: メタデータ → 本文先頭の H1 → URL の順でフォールバック
+if [[ -z "$title" && "$body" == "# "* ]]; then
+    title="${body%%$'\n'*}"
+    title="${title#\# }"
+fi
+[[ -n "$title" ]] || title="$url"
+
+# ファイル名 slug: URL パス末尾（クエリ除去→英数._- 以外は - に正規化）
+slug="$(printf '%s' "${url%%\?*}" | sed 's|/*$||; s|.*/||' \
+    | tr -cs 'A-Za-z0-9._-' '-' | sed 's/^-*//; s/-*$//' | cut -c1-80)"
+if [[ -z "$slug" ]]; then
+    slug="$(printf '%s' "$url" | sed 's|https\?://||; s|[/?#].*||' | tr -cs 'A-Za-z0-9.-' '-' | sed 's/-*$//')"
+fi
+date_prefix="$(date +%Y%m%d)"
+dest="$dest_dir/${date_prefix}-${slug}.md"
+[[ -e "$dest" ]] && dest="$dest_dir/${date_prefix}-${slug}-$(date +%H%M%S).md"
+
+saved_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+saved_from="web"
+[[ -n "$body" ]] || saved_from="link"
+
+{
+    printf '+++\n'
+    printf 'title = "%s"\n' "${title//\"/\\\"}"
+    printf 'url = "%s"\n' "$url"
+    [[ -n "$author" ]] && printf 'author = "%s"\n' "${author//\"/\\\"}"
+    [[ -n "$published" ]] && printf 'date = "%s"\n' "${published//\"/\\\"}"
+    [[ -n "$description" ]] && printf 'description = "%s"\n' "${description//\"/\\\"}"
+    printf 'saved = "%s"\n' "$saved_at"
+    printf 'saved_from = "%s"\n' "$saved_from"
+    printf '+++\n\n'
+    printf '<%s>\n\n' "$url"
+    if [[ -n "$body" ]]; then
+        printf '%s\n' "$body"
+    else
+        printf '# %s\n\n（本文取得に失敗 — リンクのみ保存。再取得はこのファイルを消して再実行）\n' "$title"
+    fi
+} > "$dest"
+
+echo "saved ($saved_from): $dest"
