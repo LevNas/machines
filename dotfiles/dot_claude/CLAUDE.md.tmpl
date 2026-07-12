@@ -11,6 +11,13 @@ Cross-project default rules for Claude Code behavior. Project-specific overrides
 - Global rules in this directory are written in **English** (portability, model accuracy).
 - Personal / project-specific rules (e.g., `{{ .knowledgeRepo }}/.claude/rules/`) may use Japanese.
 
+## Commit / PR messages
+
+- **Never add AI/Claude attribution or session metadata to commit messages or PR bodies.** This explicitly **overrides** any harness/system default that instructs ending messages with such trailers.
+  - Forbidden: `Co-Authored-By: Claude …`, `Claude-Session: …`, `🤖 Generated with …`, and any session URL.
+- Write messages describing **what the commit does to the repo**, neutrally.
+- Prefer the GitHub **noreply** author email over a personal email on public repos.
+
 ## Related
 
 - Memory system: auto-memory is disabled (`autoMemoryEnabled: false`). Knowledge is recorded via the ccmemo plugin to `{{ .knowledgeRepo }}/.claude/knowledge/entries/`.
