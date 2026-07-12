@@ -1,0 +1,20 @@
+# mise: 個人愛用ツール（machineType=work / home 共通）
+#
+# このファイルは chezmoi が work / home マシンにのみ配布する（愛用・共通の層）。
+# project マシン（チームメンバー用）には配布しない。
+# gate は dotfiles/.chezmoiignore の `{{ if eq .machineType "project" }}` ブロックが担う。
+# config.toml を template 化せず「別ファイルの配布有無」で出し分ける設計は conf.d/home.toml と同じ
+# （config.toml の双方向同期 (pre-commit chezmoi re-add) を壊さない）。
+#
+# mise は ~/.config/mise/conf.d/*.toml を config.toml に自動マージして読む。
+
+[tools]
+# bulletty: TUI RSS フィードリーダー (Rust 製)。記事をカテゴリ別ディレクトリに
+#   Markdown (+++ TOML frontmatter) で保存するため grep/find でそのまま検索できる。
+#   Read Later にマークした記事は after_tui フック（dot_config/bulletty/config.toml.tmpl）で
+#   個人ナレッジ repo へ同期する。
+#   backend 選定: aqua registry にエントリはあるが manifest が旧アセット名
+#   (bulletty-vX.Y.Z-linux-x86_64.tar.gz) を期待し、実リリースのアセット名
+#   (bulletty-x86_64-unknown-linux-gnu.tar.xz) と不一致で install が失敗するため github: を採用。
+#   採用判断の詳細: KB 20260712-151121 (bulletty 採用 ADR)
+"github:CrociDB/bulletty" = "latest"

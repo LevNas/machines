@@ -13,6 +13,12 @@
 .config/mise/conf.d/home.toml
 {{ end }}
 
+# machineType gating: 個人愛用ツール（work / home 共通）は project マシンに配布しない。
+{{ if eq .machineType "project" }}
+.config/mise/conf.d/personal.toml
+.config/bulletty/**
+{{ end }}
+
 # wezterm ランタイム状態 (透過率 opacity.state / フォントサイズ fontsize.state 等を永続化。chezmoi 管理対象外)
 .config/wezterm/*.state
 
