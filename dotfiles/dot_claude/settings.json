@@ -103,6 +103,7 @@
     ],
     "defaultMode": "auto"
   },
+  "model": "claude-fable-5[1m]",
   "worktree": {
     "baseRef": "fresh"
   },
@@ -129,6 +130,7 @@
   },
   "language": "Japanese",
   "effortLevel": "xhigh",
+  "tui": "fullscreen",
   "voice": {
     "enabled": true,
     "mode": "hold"

@@ -32,7 +32,8 @@ local function save_state(name, v)
 end
 
 -- ---------- Appearance (tmux/starship と配色統一: tokyonight storm) ----------
-config.color_scheme = "Tokyo Night Storm"
+--config.color_scheme = "Tokyo Night Storm"
+config.color_scheme = "Wez"
 config.font = wezterm.font_with_fallback({
   "HackGen Console NF",      -- 主フォント (旧 dotfiles と同じ。CJK + Nerd Font アイコン)。要 hackgen-nf-font
   "JetBrainsMono Nerd Font", -- フォールバック
