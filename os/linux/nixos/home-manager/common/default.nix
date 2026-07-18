@@ -16,6 +16,15 @@
     # ターミナル
     tmux
 
+    # 日本語検索 (migemo)
+    # cmigemo は GitHub releases 無し (source-only) のため mise に乗らず Nix 層で管理。
+    # SKK-L 系テキスト辞書 (share/migemo/utf-8/migemo-dict) を同梱し、cmigemo.nvim が
+    # バイナリの install prefix 相対で辞書を自動検出する。rustmigemo + compact-dict は
+    # 複合語語彙の欠落によりヒット率が落ちるため、本家辞書へ回帰した。
+    # cmigemo が無いホストでは cmigemo.nvim が rustmigemo (mise 管理) へ fallback する。
+    # 根拠: 個人ナレッジ KB エントリ 20260718-153000-cmigemo-quality-diagnosis-compact-dict-regression
+    cmigemo
+
     # データ処理 (mise 経由で管理)
     # 移行済み: jq, yq
 
