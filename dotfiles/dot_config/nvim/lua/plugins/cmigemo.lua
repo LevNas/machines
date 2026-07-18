@@ -5,13 +5,14 @@ return {
   "LevNas/cmigemo.nvim",
   dev = true,
   opts = {
-    -- migemo エンジンは rustmigemo (mise 管理: github:oguna/rustmigemo)。
-    -- 辞書パスは cmigemo.nvim の DICT_CANDIDATES が
-    -- ~/.local/share/migemo/migemo-compact-dict を auto-detect するので明示指定は不要
+    -- migemo エンジンは自動検出 (cmigemo → rustmigemo の順)。
+    -- NixOS 機は本家 cmigemo (home-manager 管理) ＋同梱の SKK-L 系辞書を使う
+    -- (辞書はバイナリの install prefix 相対で自動検出)。compact-dict は複合語語彙の
+    -- 欠落でヒット率が落ちるため、cmigemo が無いホストのみ rustmigemo (mise 管理) ＋
+    -- ~/.local/share/migemo/migemo-compact-dict へ fallback する
     -- (辞書は chezmoi run_once_install-migemo-dict.sh が配置)。
-    -- rustmigemo の default 出力 (PCRE) は cmigemo.nvim 内部の
-    -- pcre_to_vim_magic() で Vim regex に変換される。
-    cmigemo_cmd = "rustmigemo",
+    -- どちらのバックエンドも PCRE 出力を cmigemo.nvim 内部の pcre_to_vim_magic() で
+    -- Vim regex に変換する。
   },
   event = "VeryLazy",
 }
