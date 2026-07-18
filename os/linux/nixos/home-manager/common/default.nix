@@ -24,6 +24,10 @@
     # cmigemo が無いホストでは cmigemo.nvim が rustmigemo (mise 管理) へ fallback する。
     # 根拠: 個人ナレッジ KB エントリ 20260718-153000-cmigemo-quality-diagnosis-compact-dict-regression
     cmigemo
+    # mecab は cmigemo.nvim の flash 読みモード用 (可視テキストを読み化してかな照合)。
+    # release 無しのため mise に乗らず Nix 層 (cmigemo と同一判定)。nixpkgs 版は
+    # ipadic 同梱で PATH にあれば cmigemo.nvim が自動検出する (無ければ migemo のみで動作)。
+    mecab
 
     # データ処理 (mise 経由で管理)
     # 移行済み: jq, yq
