@@ -251,11 +251,17 @@ ghq get LevNas/ccmemo
 - 機能には影響なし。再起動で解消する
 - GNOME と Plasma の共存時に起きやすい
 
-### 古い世代の未署名カーネルが `sbctl verify` で残る
+### `sbctl verify` で `EFI/nixos/kernel-*.efi` が未署名（✗）と表示される
 
-- lanzaboote 導入前の世代に残っていた古いカーネルファイル
-- lanzaboote は UKI を使うため実際には参照されない
-- `sudo nix-collect-garbage -d` で削除可能
+- lanzaboote の仕様であり異常ではない（現行世代のカーネルにも常に ✗ が付く）
+- カーネル本体は未署名のまま ESP に置かれ、署名済みスタブ
+  （`EFI/Linux/nixos-generation-*.efi`）が埋め込み SHA-256 ハッシュで検証する
+- ファームウェアが直接実行するのは署名済みスタブのみのため、Secure Boot
+  チェーンは健全。確認すべきは `EFI/Linux/` 配下と `systemd-bootx64.efi` が
+  すべて signed であること
+- `sbctl verify` は sbctl 自身が署名管理する前提のツールで、lanzaboote の
+  ハッシュ検証方式を認識できないだけ（2026-07-20 の nixpkgs 更新時に確認。
+  旧記述「導入前世代の遺物で GC により削除可能」は誤りだったため訂正）
 
 ### git commit 時に `op-ssh-sign` 接続エラー
 
