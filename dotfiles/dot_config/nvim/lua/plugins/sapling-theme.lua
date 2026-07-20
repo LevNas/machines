@@ -18,35 +18,35 @@ return {
     config = function()
       local p = {
         -- 背景系
+        -- bg_light  = "#232433",
         bg_dark   = "#000000",
-        bg_light  = "#232433",
+        bg_light  = "#111215",
         -- 前景系
-        fg        = "#ced6f7",
-        fg_dark   = "#a9b1d6",
+        -- fg        = "#ced6f7",
+        -- fg_dark   = "#a9b1d6",
+        fg        = "#eff1f5",
+        fg_dark   = "#c7cfe5",
         fg_gutter = "#3b4261",
         -- アクセントカラー
+        -- highlights から実際に参照しているキーだけを置く。未使用の色を並べておくと
+        -- 「どれがどこに効くのか」を毎回追う羽目になるため、増やすのは使う時に。
+        -- 差し戻し用の旧値（tokyonight 寄り）:
+        --   red #f7768e / green #cff7d1 / yellow #ffff60 / blue #808bed /
+        --   magenta #bb9af7 / cyan #b9f4ee / lightgreen #f2fdf2 / lightyellow #e0af68
         black           = "#000000",
         white           = "#ffffff",
-        red             = "#f7768e",
-        green           = "#cff7d1",
-        yellow          = "#ffff60",
-        blue            = "#808bed",
-        magenta         = "#bb9af7",
-        cyan            = "#b9f4ee",
-        lightred        = "#f7768e",
-        lightgreen      = "#f2fdf2",
-        lightyellow     = "#e0af68",
-        lightblue       = "#7aa2f7",
-        lightmagenta    = "#bb9af7",
-        lightcyan       = "#7dcfff",
-        darkred         = "#f7768e",
-        darkgreen       = "#9ece6a",
+        red             = "#fb5f8e",
+        green           = "#1dc7a0",
+        yellow          = "#d8d516",
+        blue            = "#0cc8f2",
+        -- magenta / cyan は現状それぞれ red / blue と同値。キーを分けてあるので、
+        -- Constant を Error と、Keyword を Function と別色にしたくなったら
+        -- ここの値だけ変えれば分離できる（highlights 側は触らずに済む）。
+        magenta         = "#fb5f8e",
+        cyan            = "#0cc8f2",
+        lightgreen      = "#1dc7a0",
+        lightyellow     = "#d7d583",
         darkyellow      = "#fff1ad",
-        darkblue        = "#7aa2f7",
-        darkmagenta     = "#bb9af7",
-        darkcyan        = "#7dcfff",
-        orange          = "#ffeac2",
-        gray            = "#444444",
         -- 以下は highlights から参照されているため必須。コメントアウトすると
         -- nil 参照で設定テーブルが空になり、nvim_set_hl がそのグループを
         -- 完全クリアする (base へフォールバックしない)。
@@ -62,8 +62,10 @@ return {
         highlights = {
           -- 基本UI
           Normal       = { fg = p.white },
-          NormalFloat  = { fg = p.fg, bg = p.bg_dark },
-          FloatBorder  = { fg = p.border, bg = p.bg_dark },
+          -- NormalFloat  = { fg = p.fg, bg = p.bg_dark },
+          NormalFloat  = { fg = p.fg, bg = p.bg_light },
+          -- FloatBorder  = { fg = p.border, bg = p.bg_dark },
+          FloatBorder  = { fg = p.border, bg = p.bg_light },
           Cursor       = { fg = p.bg_dark, bg = p.lightgreen },
           CursorLine   = { bg = p.bg_light },
           CursorColumn = { bg = p.bg_light },
@@ -71,7 +73,9 @@ return {
           LineNr       = { fg = p.fg_gutter },
           CursorLineNr = { fg = p.blue, bg = p.bg_light, bold = true },
           Search       = { fg = p.black, bg = p.darkyellow },
-          IncSearch    = { fg = p.fg, bg = p.lightyellow },
+          -- 明るい背景色には暗い前景を当てる (fg=p.fg だとコントラスト比 1.35 で
+          -- 検索入力中のカレントマッチがほぼ読めなくなる)。
+          IncSearch    = { fg = p.black, bg = p.lightyellow },
           Pmenu        = { fg = p.fg, bg = p.bg_dark },
           PmenuSel     = { fg = p.fg, bg = p.selection, bold = true },
           PmenuSbar    = { bg = p.bg_light },
@@ -154,7 +158,7 @@ return {
           -- ラベルが無スタイル (背景と同化) になるため、ここで定義する。
           FlashBackdrop = { fg = p.fg_gutter },
           FlashMatch    = { fg = p.black, bg = p.darkyellow }, -- Search と同系
-          FlashLabel    = { fg = p.white, bg = p.red, bold = true }, -- マッチと対比
+          FlashLabel    = { fg = p.black, bg = p.red, bold = true }, -- マッチと対比
           FlashCurrent  = { fg = p.black, bg = p.lightyellow }, -- IncSearch と同系
           FlashPrompt      = { fg = p.fg, bg = p.bg_dark },
           FlashPromptIcon  = { fg = p.lightyellow },
