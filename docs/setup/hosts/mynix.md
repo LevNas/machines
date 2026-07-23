@@ -267,6 +267,9 @@ ghq get LevNas/ccmemo
 
 - 1Password GUI が起動していない場合に発生
 - 1Password GUI を起動するか、SSH agent socket を再設定
+- **GUI 起動済みでもロック中は別症状で失敗する**: `1Password: failed to fill whole buffer` /
+  `fatal: failed to write commit object`（再起動直後に典型）。プロセス稼働・agent.sock 存在でも
+  ロックだけで起きるため、ロック解除してリトライすれば解消（2026-07-21 確認）
 
 ### 指紋認証・顔認証は使えない
 
