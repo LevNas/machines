@@ -43,10 +43,19 @@ return {
       mode = { "n", "x", "o" }, desc = "Flash: Migemo Jump" },
     { "S", function() require("flash").treesitter() end,
       mode = { "n", "x", "o" }, desc = "Flash: Treesitter Jump" },
-    { "r", function() require("flash").remote() end,
-      mode = "o", desc = "Flash: Remote" },
-    { "R", function() require("flash").treesitter_search() end,
-      mode = { "o", "x" }, desc = "Flash: Treesitter Search" },
+    -- r / R は cmigemo 側に対応関数があれば migemo 入力版を使う。
+    -- 未搭載の cmigemo（旧版チェックアウト）でも壊れないようフォールバック
+    { "r", function()
+        local ok, ext = pcall(require, "cmigemo.ext.flash")
+        if ok and ext.remote then ext.remote() else require("flash").remote() end
+      end,
+      mode = "o", desc = "Flash: Migemo Remote" },
+    { "R", function()
+        local ok, ext = pcall(require, "cmigemo.ext.flash")
+        if ok and ext.treesitter_search then ext.treesitter_search()
+        else require("flash").treesitter_search() end
+      end,
+      mode = { "o", "x" }, desc = "Flash: Migemo Treesitter Search" },
     { "<c-s>", function() require("flash").toggle() end,
       mode = "c", desc = "Flash: Toggle Flash Search" },
     { "gb", function() require("cmigemo.ext.flash").bunsetsu() end,
