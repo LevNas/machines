@@ -18,6 +18,7 @@
 .config/mise/conf.d/personal.toml
 .config/bulletty/**
 .config/nvim/lua/plugins/feed.lua
+.config/nvim/lua/ext/feeds.lua
 {{ end }}
 
 # knowledgeRepo gating: 個人ナレッジ repo のパスを注入する env 定義は、

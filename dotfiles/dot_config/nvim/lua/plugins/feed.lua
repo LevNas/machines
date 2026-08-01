@@ -8,11 +8,15 @@
 return {
   "neo451/feed.nvim",
   cmd = "Feed",
-  opts = {
-    -- 購読フィードはここに追記していく (例: "https://example.com/rss.xml" や
-    -- { "https://...", name = "...", tags = { "tech" } })。
+  opts = function()
+    -- 購読フィードは 1Password → chezmoi apply で生成される ext/feeds.lua が持つ
+    -- (公開 repo に購読リストを置かない。編集は 1Password 側 → apply で反映)。
+    -- 生成物が無い環境 (apply 前・project マシン) では空リストで起動する。
     -- 空でも feeds キー自体は必須: feed.nvim の setup は resolve 済み config でなく
-    -- 生 opts の feeds を DB 同期に渡すため、省略すると pairs(nil) で起動時エラーになる。
-    feeds = {},
-  },
+    -- 生 opts の feeds を DB 同期に渡すため、nil だと pairs(nil) で起動時エラーになる。
+    -- なお :Feed soft_sync / hard_sync は config を source of truth として
+    -- config 外フィードを DB から削除する (:Feed load_opml との併用は不可)。
+    local ok, feeds = pcall(require, "ext.feeds")
+    return { feeds = ok and feeds or {} }
+  end,
 }
