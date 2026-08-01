@@ -17,6 +17,7 @@
 {{ if eq .machineType "project" }}
 .config/mise/conf.d/personal.toml
 .config/bulletty/**
+.config/nvim/lua/plugins/feed.lua
 {{ end }}
 
 # knowledgeRepo gating: 個人ナレッジ repo のパスを注入する env 定義は、

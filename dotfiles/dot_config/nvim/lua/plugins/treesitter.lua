@@ -18,6 +18,8 @@ local languages = {
   "markdown", "markdown_inline",
   -- その他よく触る言語
   "jq", "ruby", "typescript", "xml", "todotxt",
+  -- feed.nvim (RSS リーダー) の記事パースに必要 (xml は上に導入済み)
+  "html",
 }
 
 return {

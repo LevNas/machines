@@ -18,3 +18,9 @@
 #   (bulletty-x86_64-unknown-linux-gnu.tar.xz) と不一致で install が失敗するため github: を採用。
 #   採用判断の詳細: KB 20260712-151121 (bulletty 採用 ADR)
 "github:CrociDB/bulletty" = "latest"
+
+# pandoc: 汎用ドキュメント変換 CLI。feed.nvim (nvim 内 RSS リーダー、
+#   dot_config/nvim/lua/plugins/feed.lua) が記事 HTML の Markdown 変換に使う。
+#   backend 選定: mise registry 第1候補の github: をそのまま採用
+#   (github:jgm/pandoc@3.10.1 の install / pandoc --version 実行を実機検証済み)。
+"github:jgm/pandoc" = "latest"
