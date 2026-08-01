@@ -1,15 +1,13 @@
 -- chezmoi 生成ファイル (source は feeds.lua.tmpl)。
--- feed.nvim の購読フィード一覧を 1Password の Secure Note
--- (op://Personal/rss-list/feeds、1行1URL。空行と # 始まりの行は無視) から
--- chezmoi apply 時に注入する (dot_gitconfig.tmpl の onepasswordRead と同じ機構)。
+-- feed.nvim の購読フィード一覧を 1Password の Secure Note (op://Personal/rss-list/feeds)
+-- から chezmoi apply 時に注入する (dot_gitconfig.tmpl の onepasswordRead と同じ機構)。
+-- フィールド内容は feed.nvim の feeds テーブル本体としてそのまま貼り込む Lua 断片:
+--   文字列 URL ("https://...") か、エントリテーブル
+--   ({ "https://...", name = "...", tags = { "dev" } }) をカンマ区切りで列挙する。
 -- リスト変更は 1Password 側を編集 → chezmoi apply で反映。
--- 消費側 (plugins/feed.lua) は pcall require で本ファイル不在時に空リストへフォールバックする。
+-- 内容は Lua として実行される (自分の vault 前提)。構文エラー時は消費側
+-- (plugins/feed.lua) の pcall require が空リストへフォールバックする。
 local feeds = {
-{{- range splitList "\n" (onepasswordRead "op://Personal/rss-list/feeds" | trim) }}
-{{- $line := trim . }}
-{{- if and $line (not (hasPrefix "#" $line)) }}
-  {{ $line | quote }},
-{{- end }}
-{{- end }}
+{{ onepasswordRead "op://Personal/rss-list/feeds" | trim }}
 }
 return feeds
