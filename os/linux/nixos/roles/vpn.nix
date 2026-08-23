@@ -70,38 +70,54 @@ let
             exit 1
           fi
 
-          printf 'Password (%s): ' "$eap_id"
-          read -rs pw
-          echo
-          printf 'OTP (メールで届く 6 桁): '
-          read -r otp
-
-          # EAP secret = password + OTP 連結。OTP は毎回変わるため静的設定にできない。
-          # /run (tmpfs) 上の一時 swanctl ツリーから --load-creds で charon のメモリにだけ載せ、
-          # ファイルは即削除する (ディスクに平文を残さない)。
-          tmpdir=$(mktemp -d /run/wvpn.XXXXXX)
-          trap 'rm -rf "$tmpdir"' EXIT
-          cat > "$tmpdir/swanctl.conf" <<EOF
+          # EAP secret を /run (tmpfs) 上の一時 swanctl ツリーから --load-creds で
+          # charon のメモリにだけ載せ、ファイルは即削除する (ディスクに平文を残さない)。
+          load_creds() {
+            tmpdir=$(mktemp -d /run/wvpn.XXXXXX)
+            trap 'rm -rf "$tmpdir"' EXIT
+            cat > "$tmpdir/swanctl.conf" <<EOF
       include /etc/swanctl/swanctl.conf
       secrets {
         eap-wvpn {
           id = $eap_id
-          secret = "$pw$otp"
+          secret = "$1"
         }
       }
       EOF
-          SWANCTL_DIR=$tmpdir swanctl --load-creds --noprompt >/dev/null
-          rm -rf "$tmpdir"
-          trap - EXIT
-          unset pw otp
+            SWANCTL_DIR=$tmpdir swanctl --load-creds --noprompt >/dev/null
+            rm -rf "$tmpdir"
+          }
 
-          # 社内サブネットごとの child SA を順に張る。EAP/OTP 認証は最初の 1 本目
-          # (IKE_SA 確立時) だけで、以降の child は同じ IKE_SA に相乗りする。
           children=$(swanctl --list-conns | awk -F: '/: TUNNEL/ { gsub(/^[ \t]+/, "", $1); print $1 }')
           if [ -z "$children" ]; then
             echo "error: 接続定義 ($CONN) の child が見つかりません" >&2
             exit 1
           fi
+          first_child=$(printf '%s\n' "$children" | head -1)
+
+          printf 'Password (%s): ' "$eap_id"
+          read -rs pw
+          echo
+
+          # メール OTP はパスワード付きの認証試行がゲートウェイに届いた時点で発送される
+          # (TOTP と違いコードが事前に手元にない)。未着なら空 Enter でパスワードのみの
+          # 試行を先に打ち、メール送信をトリガーする (この試行は token 不足で失敗するのが期待動作)。
+          printf 'OTP 6 桁 (未着なら空 Enter でメール送信をトリガー): '
+          read -r otp
+          if [ -z "$otp" ]; then
+            load_creds "$pw"
+            echo "パスワードのみで初回試行します (認証失敗になりますが OTP メールが発送されます)..."
+            swanctl --initiate --child "$first_child" --timeout 30 || true
+            printf 'メールで届いた 6 桁を入力: '
+            read -r otp
+          fi
+
+          # EAP secret = password + OTP 連結。OTP は毎回変わるため静的設定にできない。
+          load_creds "$pw$otp"
+          unset pw otp
+
+          # 社内サブネットごとの child SA を順に張る。EAP/OTP 認証は最初の 1 本目
+          # (IKE_SA 確立時) だけで、以降の child は同じ IKE_SA に相乗りする。
           printf '%s\n' "$children" | while read -r child; do
             swanctl --initiate --child "$child" --timeout 30
           done
