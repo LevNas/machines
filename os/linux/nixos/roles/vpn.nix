@@ -154,6 +154,16 @@ in
   services.strongswan-swanctl = {
     enable = true;
     includes = [ "/etc/machines/vpn-work.swanctl.conf" ];
+    # IKE/EAP 交換のトラブルシュート用にログ詳細度を上げる (journal で相手の IDr /
+    # EAP 要求 / Vendor ID まで見えるようにする)。接続が安定したら 1 に戻してよい。
+    strongswan.extraConfig = ''
+      charon-systemd {
+        journal {
+          ike = 2
+          cfg = 2
+        }
+      }
+    '';
   };
 
   # include 先が無いと swanctl --load-all が起動時にこける可能性があるため、
