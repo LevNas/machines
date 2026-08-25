@@ -34,7 +34,7 @@ virt-manager で新規 VM を作成する際のポイント:
 2. **Overview → Firmware**: `UEFI x86_64: ...OVMF_CODE.secboot.fd` など secure boot 対応のものを選択
 3. **TPM**: モデル TIS または CRB、バージョン 2.0 を追加（swtpm が使われる）
 4. **CPU/メモリ**: Windows 11 の最小要件は 2 vCPU / 4GB。実用上は 4 vCPU / 8GB 程度を推奨
-5. **ディスク**: バス **VirtIO** を選択（性能のため）
+5. **ディスク**: 100GB・qcow2（thin provisioning、実消費は使用分のみ）。バス **VirtIO** を選択（性能のため）。配置は既定プール `/var/lib/libvirt/images`
 6. **NIC**: デバイスモデル **virtio**
 7. **CD 2 台構成**でインストール開始:
    - 1 台目: Windows 11 インストール ISO（`~/Downloads/Win11_25H2_Japanese_x64_v2.iso`。Nix 管理外のローカルファイル）
@@ -50,10 +50,11 @@ virt-manager で新規 VM を作成する際のポイント:
 
 VPN の接続先・認証情報などの実値は本リポジトリには一切書かない（[roles/vpn.nix](../../os/linux/nixos/roles/vpn.nix) と同じ方針）。VM 内の設定は VM のディスクイメージ内に閉じる。
 
-## 未決事項（VM 作成前にホスト利用者が決めること）
+## 運用上の決定事項
 
-- **Windows 11 ISO**: 取得済み（25H2 日本語 x64、`~/Downloads/` に配置。Microsoft 公式ダウンロード）。ライセンス（プロダクトキー）の扱いは利用目的に応じて決める
-- **VM ディスクの容量・配置**: 既定のストレージプールは `/var/lib/libvirt/images`（root パーティション）。Windows 11 実用には 64GB 以上（推奨 80–100GB、qcow2 の thin provisioning でよい）。別パーティション・別プールにする場合は `virsh pool-define` で追加する
+- **Windows 11 ISO**: 取得済み（25H2 日本語 x64、`~/Downloads/` に配置。Microsoft 公式ダウンロード）
+- **ライセンス**: プロダクトキーなしでインストールする（インストーラの「プロダクトキーがありません」を選択）。キーは後から 設定 → システム → ライセンス認証 で投入可能
+- **VM ディスク**: 既定のストレージプール `/var/lib/libvirt/images`（root パーティション）に 100GB の qcow2（thin provisioning）。別パーティション・別プールが必要になった場合は `virsh pool-define` で追加する
 
 ## 変更を反映する際の注意
 
