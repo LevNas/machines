@@ -37,8 +37,9 @@ virt-manager で新規 VM を作成する際のポイント:
 5. **ディスク**: バス **VirtIO** を選択（性能のため）
 6. **NIC**: デバイスモデル **virtio**
 7. **CD 2 台構成**でインストール開始:
-   - 1 台目: Windows 11 インストール ISO
+   - 1 台目: Windows 11 インストール ISO（`~/Downloads/Win11_25H2_Japanese_x64_v2.iso`。Nix 管理外のローカルファイル）
    - 2 台目: `virtio-win.iso`（インストーラがディスクを認識しない場合、ここから `viostor`/`NetKVM` ドライバを読み込む）
+   - ホームディレクトリ配下の ISO は qemu ユーザーから読めず権限エラーになることがある。virt-manager が権限修正を提案するのでそれに従うか、ISO を `/var/lib/libvirt/images/` へコピーする
 8. インストール後、`virtio-win.iso` 内の `virtio-win-guest-tools.exe` を実行してドライバ一式と SPICE ゲストツールを導入
 
 ### ネットワークについて
@@ -51,7 +52,7 @@ VPN の接続先・認証情報などの実値は本リポジトリには一切�
 
 ## 未決事項（VM 作成前にホスト利用者が決めること）
 
-- **Windows 11 ISO の入手とライセンス**: Microsoft 公式のダウンロードページから ISO を取得できるが、ライセンス（プロダクトキー）の扱いは利用目的に応じて決める
+- **Windows 11 ISO**: 取得済み（25H2 日本語 x64、`~/Downloads/` に配置。Microsoft 公式ダウンロード）。ライセンス（プロダクトキー）の扱いは利用目的に応じて決める
 - **VM ディスクの容量・配置**: 既定のストレージプールは `/var/lib/libvirt/images`（root パーティション）。Windows 11 実用には 64GB 以上（推奨 80–100GB、qcow2 の thin provisioning でよい）。別パーティション・別プールにする場合は `virsh pool-define` で追加する
 
 ## 変更を反映する際の注意
