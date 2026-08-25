@@ -12,7 +12,7 @@ libvirt/QEMU による仮想化ホスト機能。Windows 11 ゲストのイン�
 | GUI 管理 | virt-manager |
 | TPM 2.0 | swtpm（ソフトウェア TPM。Windows 11 の必須要件） |
 | UEFI / Secure Boot | QEMU 同梱の OVMF（secure boot 対応ビルド含む。現行 nixpkgs では旧 `qemu.ovmf` オプションは削除済みで、追加設定不要） |
-| VirtIO ドライバ | `virtio-win` パッケージ。ISO は `/run/current-system/sw/share/virtio-win/virtio-win.iso` |
+| VirtIO ドライバ | `virtio-win` を role 内で ISO 化し `/etc/virtio-win.iso` に配置（nixpkgs のパッケージは展開済みツリーで .iso を含まないため） |
 | USB リダイレクト | `virtualisation.spiceUSBRedirection.enable`（SPICE 経由） |
 | ネットワーク | libvirt 既定の NAT（`default` ネットワーク、virbr0） |
 
@@ -38,9 +38,25 @@ virt-manager で新規 VM を作成する際のポイント:
 6. **NIC**: デバイスモデル **virtio**
 7. **CD 2 台構成**でインストール開始:
    - 1 台目: Windows 11 インストール ISO（`~/Downloads/Win11_25H2_Japanese_x64_v2.iso`。Nix 管理外のローカルファイル）
-   - 2 台目: `virtio-win.iso`（インストーラがディスクを認識しない場合、ここから `viostor`/`NetKVM` ドライバを読み込む）
+   - 2 台目: `/etc/virtio-win.iso`（インストーラがディスクを認識しない場合、ここから `viostor`/`NetKVM` ドライバを読み込む）
    - ホームディレクトリ配下の ISO は qemu ユーザーから読めず権限エラーになることがある。virt-manager が権限修正を提案するのでそれに従うか、ISO を `/var/lib/libvirt/images/` へコピーする
-8. インストール後、`virtio-win.iso` 内の `virtio-win-guest-tools.exe` を実行してドライバ一式と SPICE ゲストツールを導入
+8. インストール後、`virtio-win.iso` のルートにある `virtio-win-guest-tools.exe` を実行してドライバ一式と SPICE ゲストツールを導入
+
+### OOBE（初期セットアップ）の詰みポイント
+
+- **「ネットワークに接続しましょう」で先に進めない**: VirtIO NIC はドライバ未導入だと NIC 自体が見えない。**Shift+F10** でコマンドプロンプトを開き、virtio-win CD からドライバを読み込む:
+
+  ```bat
+  wmic logicaldisk get name,volumename
+  rem → ボリューム名 virtio-win の CD ドライブレターを確認 (例: D:)
+  pnputil /add-driver D:\NetKVM\w11\amd64\*.inf /install
+  ```
+
+- **ローカルアカウントで作成したい場合**: 25H2 では `oobe\bypassnro` が削除済み。代わりに Shift+F10 から:
+
+  ```bat
+  start ms-cxh:localonly
+  ```
 
 ### ネットワークについて
 
