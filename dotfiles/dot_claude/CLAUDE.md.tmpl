@@ -18,6 +18,17 @@ Cross-project default rules for Claude Code behavior. Project-specific overrides
 - Write messages describing **what the commit does to the repo**, neutrally.
 - Prefer the GitHub **noreply** author email over a personal email on public repos.
 
+## Model and effort ladder
+
+Plan limits are consumed by the same cost-weighted tokens as API billing (model price, thinking, and cached reads at about 5% of fresh input), so the main session's model tier and cache warmth decide how far the limits go.
+
+- **Default**: Opus at `effortLevel: high` (settings.json). Adaptive reasoning inside a level already thins routine turns, so `medium` is not the default here.
+- **Stuck**: raise to `/effort xhigh` first. Before raising, give the model a way to check its work (a test, a build, an endpoint); a check costs one turn, more effort costs every turn.
+- **Escalate**: if Opus on xhigh hits the same problem twice, `/model fable`; switch back once it is solved.
+- **Start on Fable** for sessions whose substance is design decisions, audits, or secrets boundaries (`claude --model fable`), where silent misses cost more than tokens.
+- **Keep the cache warm**: run `/compact` before a model or effort switch and before a long pause; `/clear` (after `/rename`) between unrelated tasks. One session, one arc.
+- Never put `CLAUDE_CODE_EFFORT_LEVEL` in the `env` block: it overrides `/effort`, settings and skill frontmatter alike.
+
 ## Related
 
 - Memory system: auto-memory is disabled (`autoMemoryEnabled: false`). Knowledge is recorded via the ccmemo plugin to `{{ .knowledgeRepo }}/.claude/knowledge/entries/`.
