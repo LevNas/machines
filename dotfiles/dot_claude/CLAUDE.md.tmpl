@@ -22,7 +22,7 @@ Cross-project default rules for Claude Code behavior. Project-specific overrides
 
 Plan limits are consumed by the same cost-weighted tokens as API billing (model price, thinking, and cached reads at about 5% of fresh input), so the main session's model tier and cache warmth decide how far the limits go.
 
-- **Default**: Opus at `effortLevel: high` (settings.json). Adaptive reasoning inside a level already thins routine turns, so `medium` is not the default here.
+- **Default**: Opus at `effortLevel: medium` (user settings). Effort is raised declaratively where the work needs it: a repository whose substance is design or audit sets `effortLevel: high` in its project `.claude/settings.json`, and a skill that needs depth sets `effort` in its frontmatter (in force only while the skill runs).
 - **Stuck**: raise to `/effort xhigh` first. Before raising, give the model a way to check its work (a test, a build, an endpoint); a check costs one turn, more effort costs every turn.
 - **Escalate**: if Opus on xhigh hits the same problem twice, `/model fable`; switch back once it is solved.
 - **Start on Fable** for sessions whose substance is design decisions, audits, or secrets boundaries (`claude --model fable`), where silent misses cost more than tokens.

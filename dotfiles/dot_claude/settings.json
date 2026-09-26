@@ -139,7 +139,7 @@
     }
   },
   "language": "Japanese",
-  "effortLevel": "high",
+  "effortLevel": "medium",
   "tui": "fullscreen",
   "voice": {
     "enabled": true,
