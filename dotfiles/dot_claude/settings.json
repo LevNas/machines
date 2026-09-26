@@ -127,7 +127,8 @@
     "pyright-lsp@claude-plugins-official": true,
     "lua-lsp@claude-plugins-official": true,
     "serena@claude-plugins-official": true,
-    "ccguard@levnas-plugins": true
+    "ccguard@levnas-plugins": true,
+    "ccharness@levnas-plugins": true
   },
   "extraKnownMarketplaces": {
     "levnas-plugins": {
