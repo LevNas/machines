@@ -26,7 +26,8 @@ Plan limits are consumed by the same cost-weighted tokens as API billing (model 
 - **Stuck**: raise to `/effort xhigh` first. Before raising, give the model a way to check its work (a test, a build, an endpoint); a check costs one turn, more effort costs every turn.
 - **Escalate**: if Opus on xhigh hits the same problem twice, `/model fable`; switch back once it is solved.
 - **Start on Fable** for sessions whose substance is design decisions, audits, or secrets boundaries (`claude --model fable`), where silent misses cost more than tokens.
-- **Keep the cache warm**: run `/compact` before a model or effort switch and before a long pause; `/clear` (after `/rename`) between unrelated tasks. One session, one arc.
+- **Keep the cache warm**: pick model and effort at the top of a session. Run `/compact` before a model switch and before a pause longer than the one-hour cache TTL. Effort switches keep the cache on Opus 5.5, Sonnet 5.5 and Fable 5.1.
+- **Long sessions**: one session, one theme. At an arc boundary, write the state to the issue, PR or knowledge base, then `/compact <focus of the next arc>`. Unrelated work: `/rename`, then `/clear`. Auto-compaction (`autoCompactWindow`) is the safety net, not the plan.
 - Never put `CLAUDE_CODE_EFFORT_LEVEL` in the `env` block: it overrides `/effort`, settings and skill frontmatter alike.
 
 ## Related
