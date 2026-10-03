@@ -129,7 +129,8 @@
     "lua-lsp@claude-plugins-official": true,
     "serena@claude-plugins-official": true,
     "ccguard@levnas-plugins": true,
-    "ccharness@levnas-plugins": true
+    "ccharness@levnas-plugins": true,
+    "ccwrite@levnas-plugins": true
   },
   "extraKnownMarketplaces": {
     "levnas-plugins": {
@@ -152,4 +153,13 @@
   "inputNeededNotifEnabled": true,
   "agentPushNotifEnabled": true,
   "voiceEnabled": true
+{{- if .knowledgeRepo }},
+  "pluginConfigs": {
+    "ccwrite@levnas-plugins": {
+      "options": {
+        "templates_dir": "{{ .chezmoi.homeDir }}/src/github.com/LevNas/{{ .knowledgeRepo }}/.claude/writing-templates"
+      }
+    }
+  }
+{{- end }}
 }
