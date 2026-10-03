@@ -22,3 +22,12 @@
 {{- end }}
 [ghq]
 	root = ~/src
+{{- /* ccguard's pre-push gate checks where and what Claude Code pushes (active only
+     when CLAUDECODE=1; each hook chains to the repo's own .git/hooks/<name>).
+     Set only where the ccguard plugin has created the directory: a global
+     core.hooksPath pointing at a missing directory would silently disable every
+     repository's own hooks. */}}
+{{- if stat (joinPath .chezmoi.homeDir ".local/share/ccguard/git-hooks") }}
+[core]
+	hooksPath = ~/.local/share/ccguard/git-hooks
+{{- end }}
