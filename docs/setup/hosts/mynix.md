@@ -111,6 +111,12 @@ machines リポジトリのブートストラップが参照する以下のア�
   - `email`: noreply メールアドレス（例: `<id>+LevNas@users.noreply.github.com`）
   - `signing-key`: SSH 公開鍵全体（`ssh-ed25519 AAAA...`）
 
+### 2.4 `machines-vpn-work-swanctl`（任意・IPsec-VPN を使う場合）
+
+- 種類: Secure Note
+- フィールド `content`（テキストフィールド）: work 用 IPsec-VPN の swanctl 接続定義
+- テンプレートと配置手順は [docs/roles/vpn.md](../../roles/vpn.md) を参照
+
 ## 3. machines リポジトリの適用
 
 ### 3.1 git 最小設定
