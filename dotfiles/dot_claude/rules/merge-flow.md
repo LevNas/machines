@@ -14,9 +14,9 @@ How a PR or MR moves from review to merge to cleanup. Plugins stay loosely coupl
 
 - **Merge only on the user's word.**
 - **After the merge**, follow the cleanup hint it prints:
-  - Keep the merged branch's worktree; do not remove it yourself.
-  - Run `worktree-sweep` from the main checkout.
-  - Run delete-class commands only on the user's word. Never use `--force`.
+  - **In the merged branch's worktree**: leave it with `ExitWorktree`, action `keep` (never action `remove`), then run `worktree-sweep` from the main checkout.
+  - **In the worktree of the PR's base branch** (stacked worktrees): run `git pull --ff-only` there instead of leaving.
+  - Remove worktrees and branches only through the sweep's delete-class commands, on the user's word. Never use `--force`.
 - **Bring the PR's base branch up to date where it is checked out**: the main checkout, or the parent worktree for stacked worktrees.
   - `worktree-sweep` does this, or prints the command when that worktree is in use by another session.
   - Never touch a worktree that another live session holds.
