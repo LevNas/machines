@@ -25,3 +25,8 @@ How a PR or MR moves from review to merge to cleanup. Plugins stay loosely coupl
 
 - Plugins do not depend on each other. Compose them here, not inside a plugin.
 - When writing or editing a plugin's text, name other plugins only as "if installed".
+- **When building a plugin, skill, hook or Workflow, assign each step to the least-privileged role that can do it**:
+  - A step whose answer is the same every time goes to a script, with no agent.
+  - A step that needs judgment goes to a subagent with the fewest tools it needs.
+  - A step with an external, hard-to-undo effect (push, PR, merge, delete) stays with the main session and runs only on the user's word.
+  - Detail: knowledge base entry `20261004-163238-least-privilege-role-assignment-script-subagent-main-adr-draft` (recall it when the knowledge base is available).
