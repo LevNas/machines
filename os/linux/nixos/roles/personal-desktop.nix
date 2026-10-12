@@ -103,6 +103,9 @@
   environment.systemPackages = with pkgs; [
     # ターミナルエミュレータ
     wezterm
+    # クリップボード (Wayland)。nvim の clipboard=unnamedplus は外部コマンドを順に探し、
+    # wl-copy / wl-paste が無いと tmux 経由 (OSC 52 頼み) に落ちて他アプリへ届かない。
+    wl-clipboard
     # ビデオ会議 (unfree, allowUnfree は hosts/mynix/default.nix で設定済み)。
     # nixpkgs が Zoom 公式バイナリを buildFHSEnv(bubblewrap) で wrap（更新は nixpkgs 追従）。
     # FHS 互換のための名前空間分離はあるが権限縮小ではない（ホーム/デバイスへのアクセスは広い）。
